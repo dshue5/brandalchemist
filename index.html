@@ -375,6 +375,23 @@ V.forEach(v=>{
 
 
 render();
+
+(window.requestIdleCallback||(fn=>setTimeout(fn,200)))(()=>{
+  Object.values(B).forEach(brand=>{
+    const exts=['webp','jpg','jpeg','png','gif','avif'];
+    const slugs=slugVariants(brand.n);
+    const candidates=slugs.flatMap(s=>exts.map(e=>`images/${s}.${e}`));
+    let i=0;
+    function tryNext(){
+      if(i>=candidates.length)return;
+      const img=new Image();
+      img.onload=()=>{};
+      img.onerror=()=>tryNext();
+      img.src=candidates[i++];
+    }
+    tryNext();
+  });
+});
 </script>
 </body>
 </html>
