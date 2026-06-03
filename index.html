@@ -75,6 +75,10 @@ h1 em{font-style:italic;color:var(--accent)}
 .reveal.on .r-btn{opacity:1}
 .r-btn:hover{border-color:var(--fg);color:var(--fg)}
 
+.mix-btn{display:none;margin-bottom:40px;padding:12px 40px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;transition:background .15s,color .15s}
+.mix-btn:hover{background:var(--accent);color:var(--bg)}
+.mix-btn.show{display:inline-block}
+
 .kbd{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#1A1A1A;white-space:nowrap;pointer-events:none}
 
 .counter{margin-top:60px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#2A2A2A}
@@ -105,6 +109,7 @@ h1 em{font-style:italic;color:var(--accent)}
   </div>
 
   <p class="instr" id="instr">Select a value to begin</p>
+  <button class="mix-btn" id="mixBtn">Mix</button>
   <div class="grid" id="grid"></div>
 
 </div>
@@ -118,7 +123,7 @@ h1 em{font-style:italic;color:var(--accent)}
     <span class="r-nav-count" id="rNavCount"></span>
     <button class="r-nav-btn" id="rNext">next →</button>
   </div>
-  <button class="r-btn" id="rReset">← exit</button>
+  <button class="r-btn" id="rReset">← Try another</button>
 </div>
 
 <p class="kbd">esc to go back</p>
@@ -243,23 +248,22 @@ function render(){
   else if(!selB) instr.textContent='Now select a second value';
   else instr.textContent='';
 
+  const mixBtn=document.getElementById('mixBtn');
+  mixBtn.classList.toggle('show',!!(selA&&selB));
+
   document.querySelectorAll('.val').forEach(el=>{
     const v=el.dataset.v;
     el.classList.remove('sel-a','sel-b','off');
     if(v===selA) el.classList.add('sel-a');
     else if(v===selB) el.classList.add('sel-b');
-    else if(selA&&selB) el.classList.add('off');
   });
-
-  if(selA&&selB) showReveal();
 }
 
 function pick(v){
-  if(selA&&selB) return;
   if(v===selA) selA=null;
   else if(v===selB) selB=null;
   else if(!selA) selA=v;
-  else selB=v;
+  else if(!selB) selB=v;
   render();
 }
 
@@ -324,7 +328,6 @@ function showReveal(){
 function reset(){
   document.getElementById('reveal').classList.remove('on');
   document.getElementById('rNav').style.display='none';
-  document.getElementById('rReset').textContent='← Try another';
   tMode=false;
   selA=null;selB=null;
   render();
@@ -351,7 +354,7 @@ document.getElementById('debugBtn').addEventListener('click',()=>{
   tMode=true;
   tIdx=0;
   document.getElementById('rNav').style.display='flex';
-  document.getElementById('rReset').textContent='← exit';
+  document.getElementById('rReset').textContent='← back';
   tShow(0);
   requestAnimationFrame(()=>document.getElementById('reveal').classList.add('on'));
 });
@@ -359,6 +362,7 @@ document.getElementById('debugBtn').addEventListener('click',()=>{
 document.getElementById('rPrev').addEventListener('click',()=>tShow(tIdx-1));
 document.getElementById('rNext').addEventListener('click',()=>tShow(tIdx+1));
 
+document.getElementById('mixBtn').addEventListener('click',()=>{if(selA&&selB) showReveal()});
 document.getElementById('rReset').addEventListener('click',reset);
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape') reset();
