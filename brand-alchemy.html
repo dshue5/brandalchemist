@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brand Alchemist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--fg:#EDE8E0;--accent:#DEFF47;
+  --dim:#252525;--mid:#585858;
+  --serif:'Cormorant Garamond',serif;--mono:'Space Mono',monospace;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--mono);font-size:13px;min-height:100vh;overflow-x:hidden}
+
+.page{max-width:880px;margin:0 auto;padding:52px 28px 120px}
+
+.eyebrow{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--mid);margin-bottom:20px}
+
+h1{font-family:var(--serif);font-weight:300;font-size:clamp(54px,9vw,108px);line-height:.88;letter-spacing:-.02em;margin-bottom:28px}
+h1 em{font-style:italic;color:var(--accent)}
+
+.intro{font-size:12px;color:var(--mid);letter-spacing:.04em;line-height:1.9;max-width:360px;margin-bottom:72px}
+
+.formula{display:flex;align-items:stretch;gap:16px;margin-bottom:56px;min-height:64px}
+.slot{flex:1;border-bottom:1px solid var(--dim);display:flex;align-items:flex-end;padding-bottom:10px;transition:border-color .25s;cursor:default}
+.slot.active{border-color:var(--accent)}
+.slot-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.slot-value{font-family:var(--serif);font-style:italic;font-size:32px;color:var(--accent);line-height:1;animation:up .25s ease both}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.op{font-family:var(--serif);font-size:30px;font-weight:300;color:var(--dim);display:flex;align-items:flex-end;padding-bottom:10px;transition:color .25s;flex-shrink:0;user-select:none}
+.op.lit{color:var(--accent)}
+
+.instr{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--mid);margin-bottom:20px;height:14px}
+.grid{display:flex;flex-wrap:wrap;gap:8px}
+
+.val{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:9px 16px;border:1px solid var(--dim);background:transparent;color:#666;cursor:pointer;transition:all .15s ease;user-select:none;-webkit-tap-highlight-color:transparent}
+.val:hover:not(.sel-a):not(.sel-b):not(.off){border-color:#444;color:var(--fg)}
+.val.sel-a{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:700}
+.val.sel-b{border-color:var(--accent);color:var(--accent)}
+.val.off{opacity:.18;pointer-events:none}
+
+.reveal{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.reveal.on{opacity:1;pointer-events:all}
+
+.r-combo{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--mid);display:flex;align-items:center;gap:14px;margin-bottom:36px}
+.r-combo .a{color:var(--accent)}
+.r-combo .b{color:var(--accent)}
+
+.r-line{width:0;height:1px;background:var(--accent);transition:width .55s cubic-bezier(.16,1,.3,1);margin-bottom:32px;flex-shrink:0}
+.reveal.on .r-line{width:min(560px,80vw)}
+
+.r-brand{font-family:var(--serif);font-weight:300;font-size:clamp(50px,10.5vw,136px);line-height:.88;letter-spacing:-.02em;text-align:center;opacity:0;transform:translateY(18px);transition:opacity .45s ease .25s,transform .45s ease .25s}
+.reveal.on .r-brand{opacity:1;transform:translateY(0)}
+
+.r-tagline{font-family:var(--serif);font-style:italic;font-size:clamp(15px,2.2vw,20px);color:var(--mid);margin-top:20px;text-align:center;opacity:0;transition:opacity .45s ease .45s;max-width:480px;line-height:1.3}
+.reveal.on .r-tagline{opacity:1}
+
+.r-cat{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-top:14px;text-align:center;opacity:0;transition:opacity .45s ease .6s}
+.reveal.on .r-cat{opacity:1}
+
+.r-unknown{font-family:var(--serif);font-style:italic;font-size:clamp(22px,3.5vw,38px);color:#2E2E2E;text-align:center;max-width:460px;line-height:1.5;opacity:0;transform:translateY(18px);transition:opacity .45s ease .25s,transform .45s ease .25s}
+.reveal.on .r-unknown{opacity:1;transform:translateY(0)}
+
+#rContent{display:flex;flex-direction:column;align-items:center;width:100%}
+.r-img-wrap{width:min(280px,70vw);height:min(280px,70vw);margin-top:28px;opacity:0;transition:opacity .45s ease .55s;flex-shrink:0}
+.reveal.on .r-img-wrap{opacity:1}
+.r-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+
+.r-btn{margin-top:60px;padding:11px 30px;border:1px solid var(--dim);background:transparent;color:var(--mid);font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;opacity:0;transition:opacity .45s ease .75s,color .2s,border-color .2s}
+.reveal.on .r-btn{opacity:1}
+.r-btn:hover{border-color:var(--fg);color:var(--fg)}
+
+.kbd{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#1A1A1A;white-space:nowrap;pointer-events:none}
+
+.counter{margin-top:60px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#2A2A2A}
+.counter span{color:#3A3A3A}
+
+.debug-btn{position:fixed;bottom:22px;right:22px;background:transparent;border:none;color:transparent;font-family:var(--mono);font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:6px 12px;cursor:default;width:80px;height:28px}
+
+.r-nav{display:flex;align-items:center;gap:24px;margin-top:32px;opacity:0;transition:opacity .45s ease .75s}
+.reveal.on .r-nav{opacity:1}
+.r-nav-btn{background:transparent;border:1px solid var(--dim);color:var(--mid);font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;padding:11px 24px;cursor:pointer;transition:color .2s,border-color .2s}
+.r-nav-btn:hover{border-color:var(--fg);color:var(--fg)}
+.r-nav-count{font-size:10px;letter-spacing:.18em;color:#333;min-width:60px;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <h1>Brand<br><em>Alchemist</em></h1>
+  <p class="intro">Select two values.<br>Discover what brand lives at their intersection.</p>
+
+  <div class="formula">
+    <div class="slot" id="slotA"><span id="slotAT" class="slot-label">First value</span></div>
+    <div class="op" id="op">+</div>
+    <div class="slot" id="slotB"><span id="slotBT" class="slot-label">Second value</span></div>
+  </div>
+
+  <p class="instr" id="instr">Select a value to begin</p>
+  <div class="grid" id="grid"></div>
+
+</div>
+
+<div class="reveal" id="reveal">
+  <div class="r-combo"><span class="a" id="rA"></span><span style="color:var(--dim)">×</span><span class="b" id="rB"></span></div>
+  <div class="r-line"></div>
+  <div id="rContent"></div>
+  <div class="r-nav" id="rNav" style="display:none">
+    <button class="r-nav-btn" id="rPrev">← prev</button>
+    <span class="r-nav-count" id="rNavCount"></span>
+    <button class="r-nav-btn" id="rNext">next →</button>
+  </div>
+  <button class="r-btn" id="rReset">← exit</button>
+</div>
+
+<p class="kbd">esc to go back</p>
+<button class="debug-btn" id="debugBtn">troubleshoot</button>
+
+<script>
+const V=['edgy','avant-garde','americana','luxury','minimal','playful','dark','rebellious','nostalgic','technical','organic','camp','affordable','intellectual'];
+
+const B={
+  'avant-garde+edgy':   {n:'Rick Owens',              t:'LA label known for gothic, architectural silhouettes and an uncompromising dark aesthetic',           c:'Fashion'},
+  'americana+edgy':     {n:'Denim Tears',               t:'The label using American iconography to address Black history and identity',        c:'Fashion'},
+  'edgy+luxury':        {n:'Alexander McQueen',        t:'Dramatic British tailoring that consistently finds beauty in darkness',               c:'Fashion'},
+  'edgy+minimal':       {n:'Helmut Lang',              t:'90s minimalist label that stripped fashion to its rawest, most industrial form',           c:'Fashion'},
+  'edgy+playful':       {n:'Diesel',                   t:'Italian denim brand that built its identity on deliberately provocative advertising',        c:'Denim'},
+  'dark+edgy':          {n:'Chrome Hearts',            t:'LA label making gothic sterling silver jewellery and leather goods since the late 80s',            c:'Accessories'},
+  'edgy+rebellious':    {n:'Undercover',               t:'Japanese label mixing punk references with literary themes and intricate construction',                c:'Fashion'},
+  'edgy+nostalgic':     {n:'Heaven by Marc Jacobs',     t:'Marc Jacobs\' youth-focused line channelling Y2K nostalgia, outsider teen imagery, and a love of the weird and sentimental',c:'Fashion'},
+  'edgy+technical':     {n:'Acronym',                  t:'Hyper-functional urban outerwear with a near-cult following',                     c:'Technical Apparel'},
+  'edgy+organic':       {n:'Nudie Jeans',              t:'Swedish denim brand focused on organic cotton and a well-regarded free repair program',                 c:'Denim'},
+  'camp+edgy':          {n:'Jean Paul Gaultier',       t:'French couture house known for subverting gender norms, with a signature spanning corsets and marinières',               c:'Fashion'},
+  'affordable+edgy':    {n:'Pleasures',                t:'LA label drawing on heavy metal, horror, and underground subcultures through graphic-heavy drops at accessible prices',c:'Streetwear'},
+  'americana+avant-garde':{n:'Thom Browne',             t:'Takes classic American suiting and distorts it into something surreal and theatrical',c:'Fashion'},
+  'avant-garde+luxury': {n:'Maison Margiela',          t:'Parisian house founded on deconstruction, anonymity, and garments that expose their own construction',      c:'Fashion'},
+  'avant-garde+minimal':{n:'Phoebe Philo',              t:'Eponymous label built on exceptional fabrication, precise tailoring, and a woman-centred vision that prioritises intelligence over spectacle',c:'Fashion'},
+  'avant-garde+playful':{n:'Walter Van Beirendonck',   t:'Belgian label whose maximalist collections have consistently addressed politics, sexuality, and fantasy',        c:'Fashion'},
+  'avant-garde+dark':   {n:'Comme des Garçons',        t:'The Tokyo and Paris label that has spent decades challenging what clothing is allowed to be',          c:'Fashion'},
+  'avant-garde+rebellious':{n:'Yohji Yamamoto',        t:'Japanese label whose voluminous black clothing has rejected Western fashion conventions since the 70s',           c:'Fashion'},
+  'avant-garde+nostalgic':{n:'Dries Van Noten',        t:'Belgian label known for richly layered textiles and print rooted in cultural memory',       c:'Fashion'},
+  'avant-garde+technical':{n:'Issey Miyake',           t:'Japanese label known for innovation in fabric technology, from Pleats Please to whole-garment A-POC knitting',             c:'Fashion'},
+  'avant-garde+organic':{n:'Eckhaus Latta',            t:'New York label known for inclusive, body-aware clothing with an art school sensibility',                c:'Fashion'},
+  'avant-garde+camp':   {n:'Viktor & Rolf',             t:'Dutch couture duo who treat the runway as conceptual performance art, from wearable furniture to gowns assembled from archived pieces',c:'Fashion'},
+  'affordable+avant-garde':{n:'Telfar',                     t:'The label that made an accessible bag into a cultural symbol, built around community and openness',            c:'Fashion'},
+  'americana+luxury':   {n:'Ralph Lauren',             t:'Built an empire around an idealised American life, blending equestrian, preppy, and Western references',             c:'Fashion'},
+  'americana+minimal':  {n:'Todd Snyder',              t:'American menswear that sits quietly between classic and contemporary with strong fabrication',             c:'Fashion'},
+  'americana+playful':  {n:'Sandy Liang',               t:'New York label that turned bows and vintage softness into a downtown cultural moment',     c:'Fashion'},
+  'americana+dark':     {n:'Schott NYC',                t:'New York brand that put the motorcycle jacket on the map and has been making rugged leather outerwear since 1913',c:'Outerwear'},
+  'americana+rebellious':{n:'Supreme',                 t:'New York skate shop that turned weekly limited drops into a global cultural phenomenon',                        c:'Streetwear'},
+  'americana+nostalgic':{n:"Levi's",                   t:'The denim everyone eventually wears',                 c:'Denim'},
+  'americana+technical':{n:'Carhartt WIP',             t:'Carhartt\'s European offshoot, bringing its workwear codes to skate and club culture',                 c:'Workwear'},
+  'americana+organic':  {n:'Patagonia',                t:'Outdoor brand whose environmental activism is as central to its identity as its gear',                    c:'Outdoor'},
+  'americana+camp':     {n:'ERL',                       t:'California label blending beach nostalgia, American kitsch, and a queered take on Malibu fantasy',c:'Fashion'},
+  'affordable+americana':{n:'Wrangler',                t:'American denim brand making jeans for rodeo cowboys since 1947',                   c:'Denim'},
+  'luxury+minimal':     {n:'The Row',                  t:'Built as a total rejection of celebrity fashion, anchored in exceptional fabric and quiet luxury',                  c:'Fashion'},
+  'luxury+playful':     {n:'Versace',                  t:'Italian house defined by bold Baroque print, gold hardware, and maximalist sensuality',            c:'Fashion'},
+  'dark+luxury':        {n:'Saint Laurent',            t:'Parisian house that channels rock music and bohemian glamour through sharp, darkly romantic tailoring',              c:'Fashion'},
+  'luxury+rebellious':  {n:'Balenciaga',               t:'Luxury house that rewired fashion\'s relationship with streetwear',             c:'Fashion'},
+  'luxury+nostalgic':   {n:'Chanel',                   t:'Parisian house whose tweed suit, quilted bag, and No. 5 became permanent cultural objects',         c:'Fashion'},
+  'luxury+technical':   {n:'Hermès',                   t:'Parisian leather goods house whose handmade bags have become legitimate financial assets',          c:'Fashion'},
+  'luxury+organic':     {n:'Loro Piana',               t:'Italian house making the world\'s finest cashmere and vicuña for those who don\'t need to show it',                  c:'Fashion'},
+  'camp+luxury':        {n:'Valentino',                t:'Roman house known for saturated colour, floral embroidery, and unapologetic romantic maximalism',                    c:'Fashion'},
+  'affordable+luxury':  {n:'Coach',                    t:'American leather goods brand that defined what accessible luxury looked like in the 90s',       c:'Accessories'},
+  'minimal+playful':    {n:'Jacquemus',                t:'Extreme silhouettes and micro bags with a strong Mediterranean colour sensibility',            c:'Fashion'},
+  'dark+minimal':       {n:'COS',                      t:'H&M\'s minimal offshoot focused on clean shapes and better fabrication',          c:'Fashion'},
+  'minimal+rebellious': {n:'A.P.C.',                   t:'Parisian label built on raw denim and a deliberate refusal to explain itself',            c:'Fashion'},
+  'minimal+nostalgic':  {n:'Totême',                   t:'Stockholm label whose restrained basics and coat silhouettes carry a quietly nostalgic quality',            c:'Fashion'},
+  'minimal+technical':  {n:"Arc'teryx",                t:'Vancouver Gore-Tex outerwear setting the standard for mountain performance',         c:'Technical Apparel'},
+  'minimal+organic':    {n:'Eileen Fisher',             t:'Simple organic cotton and linen clothing with a long-running garment take-back program',      c:'Fashion'},
+  'camp+minimal':       {n:'Prada',                    t:'The Milanese house that consistently makes a case for beauty in the overlooked and unflattering',    c:'Fashion'},
+  'affordable+minimal': {n:'Uniqlo',                   t:'Japanese basics brand whose quality-to-price ratio and designer collaborations set it apart',        c:'Fashion'},
+  'dark+playful':       {n:'Anna Sui',                 t:'New York label with a purple-and-black signature mixing 70s rock, vintage fairy tale references, and the occult',            c:'Fashion'},
+  'playful+rebellious': {n:'Palace',                   t:'London skate brand whose irreverent sense of humour carries through everything it does',              c:'Streetwear'},
+  'nostalgic+playful':  {n:'Rowing Blazers',           t:'A New York brand reviving vintage preppy and collegiate clothing with archival precision and self-aware irony',                c:'Fashion'},
+  'playful+technical':  {n:'Nothing',                  t:'Consumer tech brand known for transparent design and a clear stance against Apple\'s closed aesthetic',       c:'Technology'},
+  'organic+playful':    {n:'United Colors of Benetton',t:'Italian knitwear brand known for colourful basics and decades of deliberately provocative advertising',                   c:'Fashion'},
+  'camp+playful':       {n:'Moschino',                 t:'Italian house built on the idea that fashion takes itself far too seriously',              c:'Fashion'},
+  'affordable+playful': {n:'Converse',                 t:'American sneaker brand whose Chuck Taylor has been adopted by basketball players, punk bands, and art students alike',        c:'Footwear'},
+  'dark+rebellious':    {n:'Vivienne Westwood',        t:'The British label that built punk\'s visual language in the 70s and has spent decades on political causes',                c:'Fashion'},
+  'dark+nostalgic':     {n:'Ann Demeulemeester',       t:'Poetic, androgynous clothing in black and white with gothic references',                    c:'Fashion'},
+  'dark+technical':     {n:'Stone Island',             t:'Italian technical brand known for material experimentation and a compass badge adopted by football culture',         c:'Technical Apparel'},
+  'dark+organic':       {n:'Stutterheim',              t:'Swedish rainwear brand whose melancholic identity is built around its founder\'s grandfather and a single coat made for grey days',c:'Fashion'},
+  'camp+dark':          {n:'Mugler',                   t:'French house known for body-conscious power dressing, sculptural silhouettes, and a fetish-inflected theatricality',            c:'Fashion'},
+  'affordable+dark':    {n:'All Saints',               t:'British brand that brought a rock-influenced wardrobe to accessible prices',    c:'Fashion'},
+  'nostalgic+rebellious':{n:'Stüssy',                  t:'Grown from surfboard shaping in early-80s California into one of the original streetwear labels',        c:'Streetwear'},
+  'rebellious+technical':{n:'Arc\'teryx Veilance',      t:'The technical outerwear label stripped of all outdoor branding — cold, architectural, and built to an almost hostile standard of precision',c:'Technical Apparel'},
+  'organic+rebellious': {n:'Veja',                     t:'French sneaker brand built entirely on transparent supply chains and sustainable materials',          c:'Footwear'},
+  'camp+rebellious':    {n:'Betsey Johnson',           t:'Exuberant New York label that brought punk energy to feminine silhouettes',                 c:'Fashion'},
+  'affordable+rebellious':{n:'Corteiz',                t:'London streetwear label that built a cult following through locked drops, guerrilla marketing, and a deliberate rejection of the mainstream',c:'Streetwear'},
+  'nostalgic+technical':{n:'Barbour',                  t:'British waxed cotton outerwear that has been worn for over a century',   c:'Outerwear'},
+  'nostalgic+organic':  {n:'Kapital',                  t:'Japanese brand that draws on global textile traditions through obsessive archival research',      c:'Fashion'},
+  'camp+nostalgic':     {n:'Miu Miu',                  t:'Prada\'s younger line, known for Mary Janes and micro-minis with a knowing, slightly unsettling take on girlhood',            c:'Fashion'},
+  'affordable+nostalgic':{n:'Gap',                     t:'The brand whose hoodies and khakis defined a generation of American casual dressing',                           c:'Fashion'},
+  'organic+technical':  {n:'and wander',              t:'Japanese trail brand making lightweight technical clothing with a clean, minimal sensibility',  c:'Outdoor'},
+  'camp+technical':     {n:'MSCHF',                    t:'Internet-native collective whose drops, from Satan shoes to Big Red Boots, function as conceptual art pranks',       c:'Art / Brand'},
+  'affordable+technical':{n:'New Balance',              t:'American footwear brand whose unglamorous commitment to fit and function made it an unlikely fashion icon',c:'Footwear'},
+  'camp+organic':       {n:'Stella McCartney',         t:'British label built entirely on fur-free and leather-free clothing', c:'Fashion'},
+  'affordable+organic': {n:'Colorful Standard',        t:'Danish label making organic cotton basics in a wide colour range with a strong sustainability focus',    c:'Fashion'},
+  'affordable+camp':    {n:'Lazy Oaf',                 t:'British label known for bold graphics, irreverent prints, and a campy sensibility at accessible prices',       c:'Fashion'},
+  'edgy+intellectual':      {n:'Raf Simons',           t:'Belgian label whose collections are consistently rooted in youth subculture, music, and art history',     c:'Fashion'},
+  'avant-garde+intellectual':{n:'Kiko Kostadinov',     t:'Research-based label grown from Asics collaborations into a rigorous, conceptually driven collection',            c:'Fashion'},
+  'americana+intellectual': {n:'Proenza Schouler',    t:'New York label known for rigorous construction and consistent material experimentation',   c:'Fashion'},
+  'intellectual+luxury':    {n:'Loewe',               t:'Spanish leather goods house reframed around craft, contemporary art, and material intelligence',      c:'Fashion'},
+  'intellectual+minimal':   {n:'Lemaire',             t:'Softly draped, rounded silhouettes in muted earth tones developed through close study of art history',        c:'Fashion'},
+  'intellectual+playful':   {n:'Marni',               t:'Earthy colour combinations, mismatched prints, and chunky resin jewellery with a long-standing art-world following',         c:'Fashion'},
+  'dark+intellectual':      {n:'Peter Do',            t:'Dark, rigorous tailoring known for precise construction, intellectual restraint, and a quietly subversive approach to the female wardrobe',       c:'Fashion'},
+  'intellectual+rebellious':{n:'Craig Green',         t:'London label making sculptural clothing that explores the body and collective identity',           c:'Fashion'},
+  'intellectual+nostalgic': {n:'Wales Bonner',        t:'London label built through rigorous academic research into African and Caribbean cultural history', c:'Fashion'},
+  'intellectual+technical': {n:'Nemen',               t:'Italian technical brand that treats materials science as the primary design discipline',      c:'Technical Apparel'},
+  'intellectual+organic':   {n:'Margaret Howell',     t:'British label favouring linen and cotton, rooted in workwear and utility with nothing decorative added',         c:'Fashion'},
+  'camp+intellectual':      {n:'JW Anderson',         t:'British label known for irreverent, campy collections with a consistent engagement with art and design history',           c:'Fashion'},
+  'affordable+intellectual':{n:'Muji',                t:'Japanese retailer whose no-logo design philosophy extends from clothing to furniture to food',    c:'Lifestyle'},
+};
+
+function key(a,b){return[a,b].sort().join('+')}
+
+let selA=null,selB=null;
+
+function render(){
+  const sA=document.getElementById('slotA'),sAT=document.getElementById('slotAT');
+  const sB=document.getElementById('slotB'),sBT=document.getElementById('slotBT');
+  const op=document.getElementById('op'),instr=document.getElementById('instr');
+
+  if(selA){sA.classList.add('active');sAT.className='slot-value';sAT.textContent=selA}
+  else{sA.classList.remove('active');sAT.className='slot-label';sAT.textContent='First value'}
+
+  if(selB){sB.classList.add('active');sBT.className='slot-value';sBT.textContent=selB}
+  else{sB.classList.remove('active');sBT.className='slot-label';sBT.textContent='Second value'}
+
+  op.classList.toggle('lit',!!(selA&&selB));
+
+  if(!selA) instr.textContent='Select a value to begin';
+  else if(!selB) instr.textContent='Now select a second value';
+  else instr.textContent='';
+
+  document.querySelectorAll('.val').forEach(el=>{
+    const v=el.dataset.v;
+    el.classList.remove('sel-a','sel-b','off');
+    if(v===selA) el.classList.add('sel-a');
+    else if(v===selB) el.classList.add('sel-b');
+    else if(selA&&selB) el.classList.add('off');
+  });
+
+  if(selA&&selB) showReveal();
+}
+
+function pick(v){
+  if(selA&&selB) return;
+  if(v===selA) selA=null;
+  else if(v===selB) selB=null;
+  else if(!selA) selA=v;
+  else selB=v;
+  render();
+}
+
+function stripAccents(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+
+function slugVariants(name){
+  const norm=stripAccents(name);
+  const words=name.split(/\s+/);
+  const lower=name.toLowerCase();
+  const lowerWords=words.map(w=>w.toLowerCase());
+  const normWords=norm.split(/\s+/);
+  const normLower=norm.toLowerCase();
+  const normLowerWords=normWords.map(w=>w.toLowerCase());
+  return[
+    name,
+    words.join(''),
+    words.join('-'),
+    lowerWords.join('-'),
+    lowerWords.join('_'),
+    lower.replace(/\s+/g,''),
+    lower,
+    words[0]+(words.slice(1).map(w=>w[0].toUpperCase()+w.slice(1).toLowerCase()).join('')),
+    norm,
+    normWords.join(''),
+    normWords.join('-'),
+    normLowerWords.join('-'),
+    normLowerWords.join('_'),
+    normLower.replace(/\s+/g,''),
+    normLower,
+  ].filter((v,i,a)=>a.indexOf(v)===i);
+}
+
+function loadBrandImg(name,wrap){
+  const exts=['webp','jpg','jpeg','png','gif','avif'];
+  const slugs=slugVariants(name);
+  const candidates=slugs.flatMap(s=>exts.map(e=>`images/${s}.${e}`));
+  let i=0;
+  function tryNext(){
+    if(i>=candidates.length) return;
+    const img=new Image();
+    img.onload=()=>{wrap.appendChild(img)};
+    img.onerror=()=>{tryNext()};
+    img.src=candidates[i++];
+  }
+  tryNext();
+}
+
+function showReveal(){
+  document.getElementById('rA').textContent=selA;
+  document.getElementById('rB').textContent=selB;
+  const brand=B[key(selA,selB)];
+  const c=document.getElementById('rContent');
+  if(brand){
+    c.innerHTML=`<div class="r-brand">${brand.n}</div><div class="r-tagline">${brand.t}</div><div class="r-img-wrap" id="rImgWrap"></div>`;
+    loadBrandImg(brand.n,document.getElementById('rImgWrap'));
+  } else {
+    c.innerHTML=`<div class="r-unknown">This combination<br>has yet to be named.<br><br>Perhaps that's your job.</div>`;
+  }
+  requestAnimationFrame(()=>document.getElementById('reveal').classList.add('on'));
+}
+
+function reset(){
+  document.getElementById('reveal').classList.remove('on');
+  document.getElementById('rNav').style.display='none';
+  document.getElementById('rReset').textContent='← Try another';
+  tMode=false;
+  selA=null;selB=null;
+  render();
+}
+
+// troubleshoot mode
+let tMode=false,tIdx=0;
+const tKeys=Object.keys(B);
+
+function tShow(idx){
+  tIdx=(idx+tKeys.length)%tKeys.length;
+  const k=tKeys[tIdx];
+  const [a,b]=k.split('+');
+  document.getElementById('rA').textContent=a;
+  document.getElementById('rB').textContent=b;
+  const brand=B[k];
+  const c=document.getElementById('rContent');
+  c.innerHTML=`<div class="r-brand">${brand.n}</div><div class="r-tagline">${brand.t}</div><div class="r-img-wrap" id="rImgWrap"></div>`;
+  loadBrandImg(brand.n,document.getElementById('rImgWrap'));
+  document.getElementById('rNavCount').textContent=`${tIdx+1} / ${tKeys.length}`;
+}
+
+document.getElementById('debugBtn').addEventListener('click',()=>{
+  tMode=true;
+  tIdx=0;
+  document.getElementById('rNav').style.display='flex';
+  document.getElementById('rReset').textContent='← exit';
+  tShow(0);
+  requestAnimationFrame(()=>document.getElementById('reveal').classList.add('on'));
+});
+
+document.getElementById('rPrev').addEventListener('click',()=>tShow(tIdx-1));
+document.getElementById('rNext').addEventListener('click',()=>tShow(tIdx+1));
+
+document.getElementById('rReset').addEventListener('click',reset);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') reset();
+  if(tMode&&e.key==='ArrowLeft') tShow(tIdx-1);
+  if(tMode&&e.key==='ArrowRight') tShow(tIdx+1);
+});
+
+const grid=document.getElementById('grid');
+V.forEach(v=>{
+  const b=document.createElement('button');
+  b.className='val';b.dataset.v=v;b.textContent=v;
+  b.addEventListener('click',()=>pick(v));
+  grid.appendChild(b);
+});
+
+
+render();
+</script>
+</body>
+</html>
