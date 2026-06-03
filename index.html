@@ -278,20 +278,20 @@ function slugVariants(name){
   const normLower=norm.toLowerCase();
   const normLowerWords=normWords.map(w=>w.toLowerCase());
   return[
-    name,
-    words.join(''),
-    words.join('-'),
+    normLowerWords.join('-'),
+    normLowerWords.join('_'),
+    normLower.replace(/\s+/g,''),
+    normWords.join('-'),
     lowerWords.join('-'),
     lowerWords.join('_'),
     lower.replace(/\s+/g,''),
+    name,
+    words.join('-'),
+    words.join(''),
     lower,
     words[0]+(words.slice(1).map(w=>w[0].toUpperCase()+w.slice(1).toLowerCase()).join('')),
     norm,
     normWords.join(''),
-    normWords.join('-'),
-    normLowerWords.join('-'),
-    normLowerWords.join('_'),
-    normLower.replace(/\s+/g,''),
     normLower,
   ].filter((v,i,a)=>a.indexOf(v)===i);
 }
