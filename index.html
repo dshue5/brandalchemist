@@ -75,9 +75,9 @@ h1 em{font-style:italic;color:var(--accent)}
 .reveal.on .r-btn{opacity:1}
 .r-btn:hover{border-color:var(--fg);color:var(--fg)}
 
-.mix-btn{display:none;margin-bottom:40px;padding:12px 40px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:.25em;text-transform:uppercase;cursor:pointer;transition:background .15s,color .15s}
-.mix-btn:hover{background:var(--accent);color:var(--bg)}
-.mix-btn.show{display:inline-block}
+.mix-btn{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);padding:12px 40px;border:1px solid #2A2A2A;background:transparent;color:#2A2A2A;font-family:var(--mono);font-size:11px;letter-spacing:.25em;text-transform:uppercase;cursor:default;transition:border-color .25s,color .25s,background .15s;white-space:nowrap;pointer-events:none}
+.mix-btn.ready{border-color:var(--accent);color:var(--accent);cursor:pointer;pointer-events:all}
+.mix-btn.ready:hover{background:var(--accent);color:var(--bg)}
 
 .kbd{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#1A1A1A;white-space:nowrap;pointer-events:none}
 
@@ -109,7 +109,6 @@ h1 em{font-style:italic;color:var(--accent)}
   </div>
 
   <p class="instr" id="instr">Select a value to begin</p>
-  <button class="mix-btn" id="mixBtn">Mix</button>
   <div class="grid" id="grid"></div>
 
 </div>
@@ -126,6 +125,7 @@ h1 em{font-style:italic;color:var(--accent)}
   <button class="r-btn" id="rReset">← Try another</button>
 </div>
 
+<button class="mix-btn" id="mixBtn">Mix</button>
 <p class="kbd">esc to go back</p>
 <p class="copyright">© Derek Shue 2026</p>
 <button class="debug-btn" id="debugBtn">troubleshoot</button>
@@ -249,7 +249,7 @@ function render(){
   else instr.textContent='';
 
   const mixBtn=document.getElementById('mixBtn');
-  mixBtn.classList.toggle('show',!!(selA&&selB));
+  mixBtn.classList.toggle('ready',!!(selA&&selB));
 
   document.querySelectorAll('.val').forEach(el=>{
     const v=el.dataset.v;
