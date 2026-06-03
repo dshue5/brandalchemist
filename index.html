@@ -376,22 +376,25 @@ V.forEach(v=>{
 
 render();
 
-(window.requestIdleCallback||(fn=>setTimeout(fn,200)))(()=>{
-  Object.values(B).forEach(brand=>{
-    const exts=['webp','jpg','jpeg','png','gif','avif'];
-    const slugs=slugVariants(brand.n);
-    const candidates=slugs.flatMap(s=>exts.map(e=>`images/${s}.${e}`));
-    let i=0;
-    function tryNext(){
-      if(i>=candidates.length)return;
-      const img=new Image();
-      img.onload=()=>{};
-      img.onerror=()=>tryNext();
-      img.src=candidates[i++];
-    }
-    tryNext();
-  });
-});
+const _preloadQueue=Object.values(B);
+let _preloadIdx=0;
+function _preloadNext(){
+  if(_preloadIdx>=_preloadQueue.length)return;
+  const brand=_preloadQueue[_preloadIdx++];
+  const exts=['webp','jpg','jpeg','png','gif','avif'];
+  const slugs=slugVariants(brand.n);
+  const candidates=slugs.flatMap(s=>exts.map(e=>`images/${s}.${e}`));
+  let i=0;
+  function tryNext(){
+    if(i>=candidates.length){setTimeout(_preloadNext,100);return;}
+    const img=new Image();
+    img.onload=()=>setTimeout(_preloadNext,100);
+    img.onerror=()=>tryNext();
+    img.src=candidates[i++];
+  }
+  tryNext();
+}
+setTimeout(_preloadNext,2000);
 </script>
 </body>
 </html>
