@@ -24,8 +24,9 @@
   --dim:#252525;--mid:#585858;
   --serif:'Cormorant Garamond',serif;--mono:'Space Mono',monospace;
 }
+html{background:var(--bg)}
 html,body{height:100%}
-body{background:var(--bg);color:var(--fg);font-family:var(--mono);font-size:13px;min-height:100vh;overflow-x:hidden}
+body{color:var(--fg);font-family:var(--mono);font-size:13px;min-height:100vh;overflow-x:hidden}
 
 #bg-names{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px 28px;padding:28px;align-content:start}
 #bg-names span{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;color:#EDE8E0;opacity:0.12;transition:opacity 0.3s ease;white-space:nowrap;overflow:hidden;text-transform:uppercase}
