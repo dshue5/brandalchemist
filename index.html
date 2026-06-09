@@ -28,7 +28,7 @@ html,body{height:100%}
 body{background:var(--bg);color:var(--fg);font-family:var(--mono);font-size:13px;min-height:100vh;overflow-x:hidden}
 
 #bg-names{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px 28px;padding:28px;align-content:start}
-#bg-names span{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;color:#EDE8E0;opacity:0.04;transition:opacity 0.3s ease;white-space:nowrap;overflow:hidden;text-transform:uppercase}
+#bg-names span{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;color:#EDE8E0;opacity:0.07;transition:opacity 0.3s ease;white-space:nowrap;overflow:hidden;text-transform:uppercase}
 
 .page{max-width:880px;margin:0 auto;padding:52px 28px 120px;position:relative;z-index:1}
 
@@ -270,7 +270,7 @@ function updateBg(activeVals,revealBrand){
   activeVals.forEach(v=>{if(_v2b[v])_v2b[v].forEach(n=>highlighted.add(n))});
   document.querySelectorAll('#bg-names span').forEach(s=>{
     const n=s.dataset.b;
-    s.style.opacity=revealBrand&&n===revealBrand?'1':highlighted.has(n)?'0.12':'0.04';
+    s.style.opacity=revealBrand&&n===revealBrand?'1':highlighted.has(n)?'0.12':'0.07';
   });
 }
 
